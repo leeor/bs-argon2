@@ -1,0 +1,28 @@
+{
+  "name": "@leeor/bs-argon2",
+  "version": "0.1.0",
+  "description": "Bucklescript bindings for the argon2 module",
+  "scripts": {
+    "clean": "bsb -clean-world",
+    "build": "bsb -make-world",
+    "watch": "bsb -make-world -w",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": ["BuckleScript", "reason", "argon2"],
+  "main": "index.js",
+  "files": ["src/", "bsconfig.json"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leeor/bs-argon2.git"
+  },
+  "author": "Leeor Aharon",
+  "license": "MIT",
+  "dependencies": {
+    "argon2": "0.23.0"
+  },
+  "devDependencies": {
+    "@glennsl/bs-jest": "0.4.8",
+    "bs-platform": "5.0.3"
+  }
+}
