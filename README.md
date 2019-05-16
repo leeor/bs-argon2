@@ -2,11 +2,17 @@
 
 Based on [node-argon2](https://github.com/ranisalt/node-argon2).
 
+## Install
+
+```
+npm install @leeor/bs-argon2 --save
+```
+
 ## API
 
 ### hashString & hashBuffer
 
-Hash a `string` or a `Node.Buffer.t`, respectively, returning a `argon2Hash`.
+Hash a `string` or a `Node.Buffer.t`, respectively, returning an `argon2Hash`.
 
 ```Reason
 let hashString:
@@ -78,7 +84,7 @@ let hashBufferRaw:
 
 ### needsRehash
 
-Return whether the has needs to be recomputed due to changed options/version.
+Return whether the hash needs to be recomputed due to changed options/version.
 
 ```Reason
 let needsRehash:
