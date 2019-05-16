@@ -1,4 +1,4 @@
-type argon2Hash;
+type argon2Hash = string;
 
 [@bs.deriving abstract]
 type options = {
@@ -392,3 +392,13 @@ let needsRehash =
 
   needsRehash(str, hashOptions);
 };
+
+let hashToJson = hash => hash |> Js.Json.string;
+let jsonToHash = json =>
+  json
+  |> Js.Json.decodeString
+  |> (
+    fun
+    | Some(hash) => hash
+    | None => Js.Exn.raiseError("hash is not a JSON string")
+  );

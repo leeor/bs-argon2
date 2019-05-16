@@ -105,3 +105,6 @@ let needsRehash:
     argon2Hash
   ) =>
   bool;
+
+let hashToJson: argon2Hash => Js.Json.t;
+let jsonToHash: Js.Json.t => argon2Hash;
