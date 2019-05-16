@@ -6,7 +6,7 @@ Based on [node-argon2](https://github.com/ranisalt/node-argon2).
 
 ### hashString & hashBuffer
 
-Hash a `string` or a `Node.Buffer.t`, respectively, returning a `string`.
+Hash a `string` or a `Node.Buffer.t`, respectively, returning a `argon2Hash`.
 
 ```Reason
 let hashString:
@@ -22,7 +22,7 @@ let hashString:
     ~associatedData: Node.Buffer.t=?,
     string
   ) =>
-  Js.Promise.t(string);
+  Js.Promise.t(argon2Hash);
 
 let hashBuffer:
   (
@@ -37,7 +37,7 @@ let hashBuffer:
     ~associatedData: Node.Buffer.t=?,
     Node.Buffer.t
   ) =>
-  Js.Promise.t(string);
+  Js.Promise.t(argon2Hash);
 ```
 
 ### hashStringRaw & hashBufferRaw
@@ -82,7 +82,7 @@ Return whether the has needs to be recomputed due to changed options/version.
 
 ```Reason
 let needsRehash:
-  (~timeCost: int=?, ~memoryCost: int=?, ~version: argon2Version=?, string) =>
+  (~timeCost: int=?, ~memoryCost: int=?, ~version: argon2Version=?, argon2Hash) =>
   bool;
 ```
 
@@ -91,7 +91,7 @@ let needsRehash:
 Verify a given `string` or `Node.Buffer.t`, respectively, against a previously generated hash.
 
 ```Reason
-let verifyString: (string, string) => Js.Promise.t(bool);
+let verifyString: (argon2Hash, string) => Js.Promise.t(bool);
 
-let verifyBuffer: (string, Node.Buffer.t) => Js.Promise.t(bool);
+let verifyBuffer: (argon2Hash, Node.Buffer.t) => Js.Promise.t(bool);
 ```

@@ -1,3 +1,5 @@
+type argon2Hash;
+
 type argon2Type =
   | Argon2d
   | Argon2i
@@ -45,7 +47,7 @@ let hashString:
     ~associatedData: Node.Buffer.t=?,
     string
   ) =>
-  Js.Promise.t(string);
+  Js.Promise.t(argon2Hash);
 
 let hashBuffer:
   (
@@ -60,7 +62,7 @@ let hashBuffer:
     ~associatedData: Node.Buffer.t=?,
     Node.Buffer.t
   ) =>
-  Js.Promise.t(string);
+  Js.Promise.t(argon2Hash);
 
 let hashStringRaw:
   (
@@ -92,9 +94,14 @@ let hashBufferRaw:
   ) =>
   Js.Promise.t(Node.Buffer.t);
 
-let verifyString: (string, string) => Js.Promise.t(bool);
-let verifyBuffer: (string, Node.Buffer.t) => Js.Promise.t(bool);
+let verifyString: (argon2Hash, string) => Js.Promise.t(bool);
+let verifyBuffer: (argon2Hash, Node.Buffer.t) => Js.Promise.t(bool);
 
 let needsRehash:
-  (~timeCost: int=?, ~memoryCost: int=?, ~version: argon2Version=?, string) =>
+  (
+    ~timeCost: int=?,
+    ~memoryCost: int=?,
+    ~version: argon2Version=?,
+    argon2Hash
+  ) =>
   bool;

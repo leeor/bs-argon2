@@ -1,3 +1,5 @@
+type argon2Hash;
+
 [@bs.deriving abstract]
 type options = {
   [@bs.optional]
@@ -189,20 +191,20 @@ external hashBufferRaw:
   "hash";
 
 [@bs.module "argon2"]
-external hashString: (string, options) => Js.Promise.t(string) = "hash";
+external hashString: (string, options) => Js.Promise.t(argon2Hash) = "hash";
 
 [@bs.module "argon2"]
-external hashBuffer: (Node.Buffer.t, options) => Js.Promise.t(string) =
+external hashBuffer: (Node.Buffer.t, options) => Js.Promise.t(argon2Hash) =
   "hash";
 
 [@bs.module "argon2"]
-external verifyString: (string, string) => Js.Promise.t(bool) = "verify";
+external verifyString: (argon2Hash, string) => Js.Promise.t(bool) = "verify";
 
 [@bs.module "argon2"]
-external verifyBuffer: (string, Node.Buffer.t) => Js.Promise.t(bool) =
+external verifyBuffer: (argon2Hash, Node.Buffer.t) => Js.Promise.t(bool) =
   "verify";
 
-[@bs.module "argon2"] external needsRehash: (string, options) => bool = "";
+[@bs.module "argon2"] external needsRehash: (argon2Hash, options) => bool = "";
 
 let hashString =
     (
