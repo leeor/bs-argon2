@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/leeor/bs-argon2.git"
   },
-  "author": "Leeor Aharon",
+  "author": "leeor",
   "license": "MIT",
   "dependencies": {
     "argon2": "0.23.0"
