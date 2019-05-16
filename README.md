@@ -6,7 +6,7 @@ Based on [node-argon2](https://github.com/ranisalt/node-argon2).
 
 ### hashString & hashBuffer
 
-Hash a `String` or a `Node.Buffer.t`, respectively, returning a `String`.
+Hash a `string` or a `Node.Buffer.t`, respectively, returning a `string`.
 
 ```Reason
 let hashString:
@@ -40,9 +40,9 @@ let hashBuffer:
   Js.Promise.t(string);
 ```
 
-### `hashStringRaw` & `hashBufferRaw`
+### hashStringRaw & hashBufferRaw
 
-Hash a String or a Node.Buffer.t, respectively, returning a Node.Buffer.t.
+Hash a `string` or a `Node.Buffer.t`, respectively, returning a `Node.Buffer.t`.
 
 ```Reason
 let hashStringRaw:
@@ -88,7 +88,7 @@ let needsRehash:
 
 ### verifyString & verifyBuffer
 
-Verify a given `String` or `Node.Buffer.t`, respectively, against a previously generated hash.
+Verify a given `string` or `Node.Buffer.t`, respectively, against a previously generated hash.
 
 ```Reason
 let verifyString: (string, string) => Js.Promise.t(bool);
