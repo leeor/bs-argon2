@@ -44,6 +44,59 @@ type defaultOptions = {
   saltLength: int,
 };
 
+let decodeDefaultsValue = (key, decoder, json) => {
+  Js.Dict.get(json, key) |> decoder;
+};
+
+let decodeIntValue = (fallback, possibleJson) =>
+  switch (possibleJson) {
+  | Some(json) =>
+    json
+    |> Js.Json.decodeNumber
+    |> (
+      fun
+      | Some(num) => num |> int_of_float
+      | None => fallback
+    )
+  | None => fallback
+  };
+
+let decodeType = possibleJson => {
+  switch (possibleJson) {
+  | Some(json) =>
+    json
+    |> Js.Json.decodeNumber
+    |> (
+      fun
+      | Some(0.) => Argon2d
+      | Some(1.) => Argon2i
+      | Some(2.) => Argon2id
+      | _ =>
+        Js.Exn.raiseError("unknown Argon2 type: " ++ Js.Json.stringify(json))
+    )
+  | None =>
+    Js.Exn.raiseError("Argon2 type information not found in defaults object")
+  };
+};
+
+let decodeVersion = possibleJson => {
+  switch (possibleJson) {
+  | Some(json) =>
+    json
+    |> Js.Json.decodeNumber
+    |> (
+      fun
+      | Some(16.) => Version10
+      | Some(19.) => Version13
+      | _ =>
+        Js.Exn.raiseError(
+          "unknown Argon2 version: " ++ Js.Json.stringify(json),
+        )
+    )
+  | _ => Js.Exn.raiseError("version information not found in defaults object")
+  };
+};
+
 type numericLimit = {
   min: int,
   max: int,
@@ -56,60 +109,59 @@ type limits = {
   parallelism: numericLimit,
 };
 
+let decodeNumericLimits = (key, json) => {
+  let possibleLimits =
+    switch (Js.Dict.get(json, key)) {
+    | Some(obj) => obj |> Js.Json.decodeObject
+    | None => None
+    };
+
+  let limits =
+    possibleLimits |> Belt.Option.getWithDefault(_, Js.Dict.empty());
+
+  {
+    min:
+      limits
+      |> Js.Dict.get(_, "min")
+      |> (
+        num =>
+          switch (num) {
+          | Some(num) => num |> Js.Json.decodeNumber
+          | None => None
+          }
+      )
+      |> Belt.Option.getWithDefault(_, 0.)
+      |> int_of_float,
+    max:
+      limits
+      |> Js.Dict.get(_, "max")
+      |> (
+        num =>
+          switch (num) {
+          | Some(num) => num |> Js.Json.decodeNumber
+          | None => None
+          }
+      )
+      |> Belt.Option.getWithDefault(_, Int32.max_int |> Int32.to_float)
+      |> int_of_float,
+  };
+};
+
 [@bs.module "argon2"] external limits_: Js.Json.t = "limits";
-[@bs.module "argon2"] external defaults_: Js.Json.t = "defaults";
 
 let decodedLimits =
   limits_
   |> Js.Json.decodeObject
   |> Belt.Option.getWithDefault(_, Js.Dict.empty());
 
-let decodeNumericLimits = json => {
-  let limits =
-    json
-    |> Js.Json.decodeObject
-    |> Belt.Option.getWithDefault(_, Js.Dict.empty());
-
-  {
-    min:
-      limits
-      |> Js.Dict.get(_, "min")
-      |> Belt.Option.getWithDefault(_, Js.Json.number(0.))
-      |> Js.Json.decodeNumber
-      |> Belt.Option.getWithDefault(_, 0.)
-      |> int_of_float,
-    max:
-      limits
-      |> Js.Dict.get(_, "max")
-      |> Belt.Option.getWithDefault(_, Js.Json.number(0.))
-      |> Js.Json.decodeNumber
-      |> Belt.Option.getWithDefault(_, 0.)
-      |> int_of_float,
-  };
-};
-
 let limits = {
-  hashLength:
-    decodedLimits
-    |> Js.Dict.get(_, "hashLength")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> decodeNumericLimits,
-  timeCost:
-    decodedLimits
-    |> Js.Dict.get(_, "timeCost")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> decodeNumericLimits,
-  memoryCost:
-    decodedLimits
-    |> Js.Dict.get(_, "memoryCost")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> decodeNumericLimits,
-  parallelism:
-    decodedLimits
-    |> Js.Dict.get(_, "parallelism")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> decodeNumericLimits,
+  hashLength: decodedLimits |> decodeNumericLimits("hashLength"),
+  timeCost: decodedLimits |> decodeNumericLimits("timeCost"),
+  memoryCost: decodedLimits |> decodeNumericLimits("memoryCost"),
+  parallelism: decodedLimits |> decodeNumericLimits("parallelism"),
 };
+
+[@bs.module "argon2"] external defaults_: Js.Json.t = "defaults";
 
 let decodedDefaults =
   defaults_
@@ -118,67 +170,17 @@ let decodedDefaults =
 
 let defaults = {
   hashLength:
-    decodedDefaults
-    |> Js.Dict.get(_, "hashLength")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> Js.Json.decodeNumber
-    |> Belt.Option.getWithDefault(_, 0.)
-    |> int_of_float,
+    decodedDefaults |> decodeDefaultsValue("hashLength", decodeIntValue(0)),
   timeCost:
-    decodedDefaults
-    |> Js.Dict.get(_, "timeCost")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> Js.Json.decodeNumber
-    |> Belt.Option.getWithDefault(_, 0.)
-    |> int_of_float,
+    decodedDefaults |> decodeDefaultsValue("timeCost", decodeIntValue(0)),
   memoryCost:
-    decodedDefaults
-    |> Js.Dict.get(_, "memoryCost")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> Js.Json.decodeNumber
-    |> Belt.Option.getWithDefault(_, 0.)
-    |> int_of_float,
+    decodedDefaults |> decodeDefaultsValue("memoryCost", decodeIntValue(0)),
   parallelism:
-    decodedDefaults
-    |> Js.Dict.get(_, "parallelism")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> Js.Json.decodeNumber
-    |> Belt.Option.getWithDefault(_, 0.)
-    |> int_of_float,
-  type_:
-    decodedDefaults
-    |> Js.Dict.get(_, "type")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> Js.Json.decodeNumber
-    |> Belt.Option.getWithDefault(_, 0.)
-    |> int_of_float
-    |> (
-      fun
-      | 0 => Argon2d
-      | 1 => Argon2i
-      | 2 => Argon2id
-      | _ => Js.Exn.raiseError("unknown Argon2 type")
-    ),
-  version:
-    decodedDefaults
-    |> Js.Dict.get(_, "version")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> Js.Json.decodeNumber
-    |> Belt.Option.getWithDefault(_, 0.)
-    |> int_of_float
-    |> (
-      fun
-      | 0x10 => Version10
-      | 0x13 => Version13
-      | _ => Js.Exn.raiseError("unknown Argon2 version")
-    ),
+    decodedDefaults |> decodeDefaultsValue("parallelism", decodeIntValue(0)),
+  type_: decodedDefaults |> decodeDefaultsValue("type", decodeType),
+  version: decodedDefaults |> decodeDefaultsValue("version", decodeVersion),
   saltLength:
-    decodedDefaults
-    |> Js.Dict.get(_, "saltLength")
-    |> Belt.Option.getWithDefault(_, Js.Json.object_(Js.Dict.empty()))
-    |> Js.Json.decodeNumber
-    |> Belt.Option.getWithDefault(_, 0.)
-    |> int_of_float,
+    decodedDefaults |> decodeDefaultsValue("saltLength", decodeIntValue(0)),
 };
 
 [@bs.module "argon2"]
