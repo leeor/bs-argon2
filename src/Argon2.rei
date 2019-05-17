@@ -34,10 +34,6 @@ type limits = {
 let limits: limits;
 let defaults: defaultOptions;
 
-type hashInput =
-  | String(string)
-  | Buffer(Node.Buffer.t);
-
 let hash:
   (
     ~hashLength: int=?,
@@ -49,7 +45,7 @@ let hash:
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
-    hashInput
+    [ | `String(string) | `Buffer(Node.Buffer.t)]
   ) =>
   Js.Promise.t(argon2Hash);
 
@@ -64,11 +60,13 @@ let hashRaw:
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
-    hashInput
+    [ | `String(string) | `Buffer(Node.Buffer.t)]
   ) =>
   Js.Promise.t(Node.Buffer.t);
 
-let verify: (argon2Hash, hashInput) => Js.Promise.t(bool);
+let verify:
+  (argon2Hash, [ | `String(string) | `Buffer(Node.Buffer.t)]) =>
+  Js.Promise.t(bool);
 
 let needsRehash:
   (

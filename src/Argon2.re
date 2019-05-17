@@ -203,10 +203,6 @@ external verify:
 
 [@bs.module "argon2"] external needsRehash: (argon2Hash, options) => bool = "";
 
-type hashInput =
-  | String(string)
-  | Buffer(Node.Buffer.t);
-
 let hash =
     (
       ~hashLength: option(int)=?,
@@ -218,7 +214,7 @@ let hash =
       ~salt: option(Node.Buffer.t)=?,
       ~saltLength: option(int)=?,
       ~associatedData: option(Node.Buffer.t)=?,
-      input,
+      stringOrBuffer,
     ) => {
   let hashOptions =
     options(
@@ -243,12 +239,6 @@ let hash =
       (),
     );
 
-  let stringOrBuffer =
-    switch (input) {
-    | String(str) => `String(str)
-    | Buffer(buf) => `Buffer(buf)
-    };
-
   hash(stringOrBuffer, hashOptions);
 };
 
@@ -263,7 +253,7 @@ let hashRaw =
       ~salt: option(Node.Buffer.t)=?,
       ~saltLength: option(int)=?,
       ~associatedData: option(Node.Buffer.t)=?,
-      input,
+      stringOrBuffer,
     ) => {
   let hashOptions =
     options(
@@ -288,23 +278,7 @@ let hashRaw =
       (),
     );
 
-  let stringOrBuffer =
-    switch (input) {
-    | String(str) => `String(str)
-    | Buffer(buf) => `Buffer(buf)
-    };
-
   hashRaw(stringOrBuffer, hashOptions);
-};
-
-let verify = (hash, input) => {
-  let stringOrBuffer =
-    switch (input) {
-    | String(str) => `String(str)
-    | Buffer(buf) => `Buffer(buf)
-    };
-
-  verify(hash, stringOrBuffer);
 };
 
 let needsRehash =
