@@ -1,6 +1,6 @@
 {
   "name": "@leeor/bs-argon2",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Bucklescript bindings for the argon2 module",
   "scripts": {
     "clean": "bsb -clean-world",
