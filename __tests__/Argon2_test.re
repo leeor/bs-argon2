@@ -70,170 +70,189 @@ describe("Argon2", () => {
        })
   );
 
-  describe("hashString", () => {
-    testPromise("with argon2i", () =>
-      hashString(~salt, password)
-      |> Js.Promise.then_(hashedString =>
-           expect(hashedString |> toString)
-           |> toEqual(precomputedHashes.argon2i)
-           |> Js.Promise.resolve
-         )
-    );
+  describe("hash", () => {
+    describe("String", () => {
+      testPromise("with argon2i", () =>
+        hash(~salt, String(password))
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.argon2i)
+             |> Js.Promise.resolve
+           )
+      );
 
-    testPromise("with argon2d", () =>
-      hashString(~salt, ~type_=Argon2d, password)
-      |> Js.Promise.then_(hashedString =>
-           expect(hashedString |> toString)
-           |> toEqual(precomputedHashes.argon2d)
-           |> Js.Promise.resolve
-         )
-    );
+      testPromise("with argon2d", () =>
+        hash(~salt, ~type_=Argon2d, String(password))
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.argon2d)
+             |> Js.Promise.resolve
+           )
+      );
 
-    testPromise("with argon2id", () =>
-      hashString(~salt, ~type_=Argon2id, password)
-      |> Js.Promise.then_(hashedString =>
-           expect(hashedString |> toString)
-           |> toEqual(precomputedHashes.argon2id)
-           |> Js.Promise.resolve
-         )
-    );
+      testPromise("with argon2id", () =>
+        hash(~salt, ~type_=Argon2id, String(password))
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.argon2id)
+             |> Js.Promise.resolve
+           )
+      );
 
-    testPromise("with null in password", () =>
-      hashString(~salt, passwordWithNull)
-      |> Js.Promise.then_(hashedString =>
-           expect(hashedString |> toString)
-           |> toEqual(precomputedHashes.withNull)
-           |> Js.Promise.resolve
-         )
-    );
+      testPromise("with null in password", () =>
+        hash(~salt, String(passwordWithNull))
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.withNull)
+             |> Js.Promise.resolve
+           )
+      );
 
-    testPromise("with associatedData", () =>
-      hashString(~associatedData, ~salt, password)
-      |> Js.Promise.then_(hashedString =>
-           expect(hashedString |> toString)
-           |> toEqual(precomputedHashes.withAd)
-           |> Js.Promise.resolve
-         )
-    );
+      testPromise("with associatedData", () =>
+        hash(~associatedData, ~salt, String(password))
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.withAd)
+             |> Js.Promise.resolve
+           )
+      );
+    });
+
+    describe("Buffer", () => {
+      testPromise("with argon2i", () =>
+        hash(~salt, Buffer(Node.Buffer.fromString(password)))
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.argon2i)
+             |> Js.Promise.resolve
+           )
+      );
+
+      testPromise("with argon2d", () =>
+        hash(
+          ~salt,
+          ~type_=Argon2d,
+          Buffer(Node.Buffer.fromString(password)),
+        )
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.argon2d)
+             |> Js.Promise.resolve
+           )
+      );
+
+      testPromise("with argon2id", () =>
+        hash(
+          ~salt,
+          ~type_=Argon2id,
+          Buffer(Node.Buffer.fromString(password)),
+        )
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.argon2id)
+             |> Js.Promise.resolve
+           )
+      );
+
+      testPromise("with null in passowrd", () =>
+        hash(~salt, Buffer(Node.Buffer.fromString(passwordWithNull)))
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.withNull)
+             |> Js.Promise.resolve
+           )
+      );
+    });
   });
 
-  describe("hashStringRaw", () => {
-    testPromise("with argon2i", () =>
-      hashStringRaw(~salt, password)
-      |> Js.Promise.then_(hashedBuffer =>
-           expect(hashedBuffer)
-           |> toEqual(precomputedHashes.rawArgon2i)
-           |> Js.Promise.resolve
-         )
-    );
+  describe("hashRaw", () => {
+    describe("String", () => {
+      testPromise("with argon2i", () =>
+        hashRaw(~salt, String(password))
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawArgon2i)
+             |> Js.Promise.resolve
+           )
+      );
 
-    testPromise("with argon2d", () =>
-      hashStringRaw(~salt, ~type_=Argon2d, password)
-      |> Js.Promise.then_(hashedBuffer =>
-           expect(hashedBuffer)
-           |> toEqual(precomputedHashes.rawArgon2d)
-           |> Js.Promise.resolve
-         )
-    );
+      testPromise("with argon2d", () =>
+        hashRaw(~salt, ~type_=Argon2d, String(password))
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawArgon2d)
+             |> Js.Promise.resolve
+           )
+      );
 
-    testPromise("with argon2id", () =>
-      hashStringRaw(~salt, ~type_=Argon2id, password)
-      |> Js.Promise.then_(hashedBuffer =>
-           expect(hashedBuffer)
-           |> toEqual(precomputedHashes.rawArgon2id)
-           |> Js.Promise.resolve
-         )
-    );
+      testPromise("with argon2id", () =>
+        hashRaw(~salt, ~type_=Argon2id, String(password))
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawArgon2id)
+             |> Js.Promise.resolve
+           )
+      );
 
-    testPromise("with null in password", () =>
-      hashStringRaw(~salt, passwordWithNull)
-      |> Js.Promise.then_(hashedBuffer =>
-           expect(hashedBuffer)
-           |> toEqual(precomputedHashes.rawWithNull)
-           |> Js.Promise.resolve
-         )
-    );
-  });
+      testPromise("with null in password", () =>
+        hashRaw(~salt, String(passwordWithNull))
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawWithNull)
+             |> Js.Promise.resolve
+           )
+      );
+    });
+    describe("Buffer", () => {
+      testPromise("with argon2i", () =>
+        hashRaw(~salt, Buffer(Node.Buffer.fromString(password)))
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawArgon2i)
+             |> Js.Promise.resolve
+           )
+      );
 
-  describe("hashBuffer", () => {
-    testPromise("with argon2i", () =>
-      hashBuffer(~salt, Node.Buffer.fromString(password))
-      |> Js.Promise.then_(hashedString =>
-           expect(hashedString |> toString)
-           |> toEqual(precomputedHashes.argon2i)
-           |> Js.Promise.resolve
-         )
-    );
+      testPromise("with argon2d", () =>
+        hashRaw(
+          ~salt,
+          ~type_=Argon2d,
+          Buffer(Node.Buffer.fromString(password)),
+        )
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawArgon2d)
+             |> Js.Promise.resolve
+           )
+      );
 
-    testPromise("with argon2d", () =>
-      hashBuffer(~salt, ~type_=Argon2d, Node.Buffer.fromString(password))
-      |> Js.Promise.then_(hashedString =>
-           expect(hashedString |> toString)
-           |> toEqual(precomputedHashes.argon2d)
-           |> Js.Promise.resolve
-         )
-    );
+      testPromise("with argon2id", () =>
+        hashRaw(
+          ~salt,
+          ~type_=Argon2id,
+          Buffer(Node.Buffer.fromString(password)),
+        )
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawArgon2id)
+             |> Js.Promise.resolve
+           )
+      );
 
-    testPromise("with argon2id", () =>
-      hashBuffer(~salt, ~type_=Argon2id, Node.Buffer.fromString(password))
-      |> Js.Promise.then_(hashedString =>
-           expect(hashedString |> toString)
-           |> toEqual(precomputedHashes.argon2id)
-           |> Js.Promise.resolve
-         )
-    );
-
-    testPromise("with null in passowrd", () =>
-      hashBuffer(~salt, Node.Buffer.fromString(passwordWithNull))
-      |> Js.Promise.then_(hashedString =>
-           expect(hashedString |> toString)
-           |> toEqual(precomputedHashes.withNull)
-           |> Js.Promise.resolve
-         )
-    );
-  });
-
-  describe("hashBufferRaw", () => {
-    testPromise("with argon2i", () =>
-      hashBufferRaw(~salt, Node.Buffer.fromString(password))
-      |> Js.Promise.then_(hashedBuffer =>
-           expect(hashedBuffer)
-           |> toEqual(precomputedHashes.rawArgon2i)
-           |> Js.Promise.resolve
-         )
-    );
-
-    testPromise("with argon2d", () =>
-      hashBufferRaw(~salt, ~type_=Argon2d, Node.Buffer.fromString(password))
-      |> Js.Promise.then_(hashedBuffer =>
-           expect(hashedBuffer)
-           |> toEqual(precomputedHashes.rawArgon2d)
-           |> Js.Promise.resolve
-         )
-    );
-
-    testPromise("with argon2id", () =>
-      hashBufferRaw(~salt, ~type_=Argon2id, Node.Buffer.fromString(password))
-      |> Js.Promise.then_(hashedBuffer =>
-           expect(hashedBuffer)
-           |> toEqual(precomputedHashes.rawArgon2id)
-           |> Js.Promise.resolve
-         )
-    );
-
-    testPromise("with null in password", () =>
-      hashBufferRaw(~salt, Node.Buffer.fromString(passwordWithNull))
-      |> Js.Promise.then_(hashedBuffer =>
-           expect(hashedBuffer)
-           |> toEqual(precomputedHashes.rawWithNull)
-           |> Js.Promise.resolve
-         )
-    );
+      testPromise("with null in password", () =>
+        hashRaw(~salt, Buffer(Node.Buffer.fromString(passwordWithNull)))
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawWithNull)
+             |> Js.Promise.resolve
+           )
+      );
+    });
   });
 
   describe("hashing options", () => {
     testPromise("timeCost", () =>
-      hashString(~timeCost=4, password)
+      hash(~timeCost=4, String(password))
       |> Js.Promise.then_(hashedString =>
            expect(hashedString |> toString)
            |> toMatchRe(Js.Re.fromString("t=4"))
@@ -244,7 +263,7 @@ describe("Argon2", () => {
     testPromise("low timeCost", () => {
       let timeCost = limits.timeCost;
 
-      hashString(~timeCost=timeCost.min - 1, password)
+      hash(~timeCost=timeCost.min - 1, String(password))
       |> Js.Promise.then_(_ =>
            fail("expected hashString to reject") |> Js.Promise.resolve
          )
@@ -260,7 +279,7 @@ describe("Argon2", () => {
     testPromise("high timeCost", () => {
       let timeCost = limits.timeCost;
 
-      hashString(~timeCost=timeCost.max + 1, password)
+      hash(~timeCost=timeCost.max + 1, String(password))
       |> Js.Promise.then_(_ =>
            fail("expected hashString to reject") |> Js.Promise.resolve
          )
@@ -274,7 +293,7 @@ describe("Argon2", () => {
     });
 
     testPromise("hashLength", () =>
-      hashString(~hashLength=4, password)
+      hash(~hashLength=4, String(password))
       |> Js.Promise.then_(hashedString =>
            expect(hashedString |> toString)
            |> toMatchRe([%bs.re {json|/\$[^$]{6}$/|json}])
@@ -285,7 +304,7 @@ describe("Argon2", () => {
     testPromise("low hashLength", () => {
       let hashLength = limits.hashLength;
 
-      hashString(~hashLength=hashLength.min - 1, password)
+      hash(~hashLength=hashLength.min - 1, String(password))
       |> Js.Promise.then_(_ =>
            fail("expected hashString to reject") |> Js.Promise.resolve
          )
@@ -303,7 +322,7 @@ describe("Argon2", () => {
     testPromise("high hashLength", () => {
       let hashLength = limits.hashLength;
 
-      hashString(~hashLength=hashLength.max + 1, password)
+      hash(~hashLength=hashLength.max + 1, String(password))
       |> Js.Promise.then_(_ =>
            fail("expected hashString to reject") |> Js.Promise.resolve
          )
@@ -319,9 +338,9 @@ describe("Argon2", () => {
     });
 
     testPromise("memoryCost", () =>
-      hashString(
+      hash(
         ~memoryCost=Int32.shift_left(1l, 13) |> Int32.to_int,
-        password,
+        String(password),
       )
       |> Js.Promise.then_(hashedString =>
            expect(hashedString |> toString)
@@ -333,7 +352,7 @@ describe("Argon2", () => {
     testPromise("low memoryCost", () => {
       let memoryCost = limits.memoryCost;
 
-      hashString(~memoryCost=memoryCost.min - 1, password)
+      hash(~memoryCost=memoryCost.min - 1, String(password))
       |> Js.Promise.then_(_ =>
            fail("expected hashString to reject") |> Js.Promise.resolve
          )
@@ -351,7 +370,7 @@ describe("Argon2", () => {
     testPromise("high memoryCost", () => {
       let memoryCost = limits.memoryCost;
 
-      hashString(~memoryCost=memoryCost.max + 1, password)
+      hash(~memoryCost=memoryCost.max + 1, String(password))
       |> Js.Promise.then_(_ =>
            fail("expected hashString to reject") |> Js.Promise.resolve
          )
@@ -367,7 +386,7 @@ describe("Argon2", () => {
     });
 
     testPromise("parallelism", () =>
-      hashString(~parallelism=2, password)
+      hash(~parallelism=2, String(password))
       |> Js.Promise.then_(hashedString =>
            expect(hashedString |> toString)
            |> toMatchRe(Js.Re.fromString("p=2"))
@@ -378,7 +397,7 @@ describe("Argon2", () => {
     testPromise("low parallelism", () => {
       let parallelism = limits.parallelism;
 
-      hashString(~parallelism=parallelism.min - 1, password)
+      hash(~parallelism=parallelism.min - 1, String(password))
       |> Js.Promise.then_(_ =>
            fail("expected hashString to reject") |> Js.Promise.resolve
          )
@@ -396,7 +415,7 @@ describe("Argon2", () => {
     testPromise("high parallelism", () => {
       let parallelism = limits.parallelism;
 
-      hashString(~parallelism=parallelism.max + 1, password)
+      hash(~parallelism=parallelism.max + 1, String(password))
       |> Js.Promise.then_(_ =>
            fail("expected hashString to reject") |> Js.Promise.resolve
          )
@@ -412,11 +431,11 @@ describe("Argon2", () => {
     });
 
     testPromise("with all options", () =>
-      hashString(
+      hash(
         ~timeCost=4,
         ~memoryCost=Int32.shift_left(1l, 13) |> Int32.to_int,
         ~parallelism=2,
-        password,
+        String(password),
       )
       |> Js.Promise.then_(hashedString =>
            expect(hashedString |> toString)
@@ -428,7 +447,7 @@ describe("Argon2", () => {
 
   describe("needsRehash", () => {
     testPromise("of an old version", () =>
-      hashString(~version=Version10, password)
+      hash(~version=Version10, String(password))
       |> Js.Promise.then_(hashedString =>
            expect(hashedString |> needsRehash)
            |> toBe(true)
@@ -437,7 +456,7 @@ describe("Argon2", () => {
     );
 
     testPromise("of lower memoryCost", () =>
-      hashString(~memoryCost=defaults.memoryCost - 1, password)
+      hash(~memoryCost=defaults.memoryCost - 1, String(password))
       |> Js.Promise.then_(hashedString =>
            expect(hashedString |> needsRehash)
            |> toBe(true)
@@ -446,7 +465,7 @@ describe("Argon2", () => {
     );
 
     testPromise("of lower timeCost", () =>
-      hashString(~timeCost=2, password)
+      hash(~timeCost=2, String(password))
       |> Js.Promise.then_(hashedString =>
            expect(hashedString |> needsRehash)
            |> toBe(true)
@@ -455,92 +474,200 @@ describe("Argon2", () => {
     );
   });
 
-  describe("verifyString", () => {
-    testPromise("correct password", () =>
-      hashString(password)
-      |> Js.Promise.then_(hashedString =>
-           verifyString(hashedString, password)
-           |> Js.Promise.then_(result =>
-                expect(result) |> toBe(true) |> Js.Promise.resolve
-              )
-         )
-    );
+  describe("verify", () => {
+    describe("String", () => {
+      testPromise("correct password", () =>
+        hash(String(password))
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, String(password))
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           )
+      );
 
-    testPromise("wrong password", () =>
-      hashString(password)
-      |> Js.Promise.then_(hashedString =>
-           verifyString(hashedString, "passworld")
-           |> Js.Promise.then_(result =>
-                expect(result) |> toBe(false) |> Js.Promise.resolve
-              )
-         )
-    );
+      testPromise("wrong password", () =>
+        hash(String(password))
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, String("passworld"))
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(false) |> Js.Promise.resolve
+                )
+           )
+      );
 
-    testPromise("with null in password", () =>
-      hashString(passwordWithNull)
-      |> Js.Promise.then_(hashedString =>
-           verifyString(hashedString, passwordWithNull)
-           |> Js.Promise.then_(result =>
-                expect(result) |> toBe(true) |> Js.Promise.resolve
-              )
-         )
-    );
+      testPromise("with null in password", () =>
+        hash(String(passwordWithNull))
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, String(passwordWithNull))
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           )
+      );
 
-    testPromise("with associatedData", () =>
-      hashString(~associatedData, passwordWithNull)
-      |> Js.Promise.then_(hashedString =>
-           verifyString(hashedString, passwordWithNull)
-           |> Js.Promise.then_(result =>
-                expect(result) |> toBe(true) |> Js.Promise.resolve
-              )
-         )
-    );
+      testPromise("with associatedData", () =>
+        hash(~associatedData, String(passwordWithNull))
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, String(passwordWithNull))
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           )
+      );
 
-    testPromise("argon2d correct password", () =>
-      hashString(~type_=Argon2d, password)
-      |> Js.Promise.then_(hashedString =>
-           verifyString(hashedString, password)
-           |> Js.Promise.then_(result =>
-                expect(result) |> toBe(true) |> Js.Promise.resolve
-              )
-         )
-    );
+      testPromise("argon2d correct password", () =>
+        hash(~type_=Argon2d, String(password))
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, String(password))
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           )
+      );
 
-    testPromise("argon2d wrong password", () =>
-      hashString(~type_=Argon2d, password)
-      |> Js.Promise.then_(hashedString =>
-           verifyString(hashedString, "passworld")
-           |> Js.Promise.then_(result =>
-                expect(result) |> toBe(false) |> Js.Promise.resolve
-              )
-         )
-    );
+      testPromise("argon2d wrong password", () =>
+        hash(~type_=Argon2d, String(password))
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, String("passworld"))
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(false) |> Js.Promise.resolve
+                )
+           )
+      );
 
-    testPromise("argon2id correct password", () =>
-      hashString(~type_=Argon2id, password)
-      |> Js.Promise.then_(hashedString =>
-           verifyString(hashedString, password)
-           |> Js.Promise.then_(result =>
-                expect(result) |> toBe(true) |> Js.Promise.resolve
-              )
-         )
-    );
+      testPromise("argon2id correct password", () =>
+        hash(~type_=Argon2id, String(password))
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, String(password))
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           )
+      );
 
-    testPromise("argon2id wrong password", () =>
-      hashString(~type_=Argon2id, password)
-      |> Js.Promise.then_(hashedString =>
-           verifyString(hashedString, "passworld")
-           |> Js.Promise.then_(result =>
-                expect(result) |> toBe(false) |> Js.Promise.resolve
-              )
-         )
-    );
+      testPromise("argon2id wrong password", () =>
+        hash(~type_=Argon2id, String(password))
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, String("passworld"))
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(false) |> Js.Promise.resolve
+                )
+           )
+      );
 
-    testPromise("old has format", () =>
-      verifyString(precomputedHashes.oldFormat |> toHashed, password)
-      |> Js.Promise.then_(result =>
-           expect(result) |> toBe(true) |> Js.Promise.resolve
-         )
-    );
+      testPromise("old has format", () =>
+        verify(precomputedHashes.oldFormat |> toHashed, String(password))
+        |> Js.Promise.then_(result =>
+             expect(result) |> toBe(true) |> Js.Promise.resolve
+           )
+      );
+    });
+
+    describe("Buffer", () => {
+      testPromise("correct password", () => {
+        let buffer = Buffer(Node.Buffer.fromString(password));
+        hash(buffer)
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, buffer)
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           );
+      });
+
+      testPromise("wrong password", () =>
+        hash(Buffer(Node.Buffer.fromString(password)))
+        |> Js.Promise.then_(hashedString =>
+             verify(
+               hashedString,
+               Buffer(Node.Buffer.fromString("passworld")),
+             )
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(false) |> Js.Promise.resolve
+                )
+           )
+      );
+
+      testPromise("with null in password", () => {
+        let buffer = Buffer(Node.Buffer.fromString(password));
+        hash(buffer)
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, buffer)
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           );
+      });
+
+      testPromise("with associatedData", () => {
+        let buffer = Buffer(Node.Buffer.fromString(passwordWithNull));
+        hash(~associatedData, buffer)
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, buffer)
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           );
+      });
+
+      testPromise("argon2d correct password", () => {
+        let buffer = Buffer(Node.Buffer.fromString(password));
+        hash(~type_=Argon2d, buffer)
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, buffer)
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           );
+      });
+
+      testPromise("argon2d wrong password", () =>
+        hash(~type_=Argon2d, Buffer(Node.Buffer.fromString(password)))
+        |> Js.Promise.then_(hashedString =>
+             verify(
+               hashedString,
+               Buffer(Node.Buffer.fromString("passworld")),
+             )
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(false) |> Js.Promise.resolve
+                )
+           )
+      );
+
+      testPromise("argon2id correct password", () => {
+        let buffer = Buffer(Node.Buffer.fromString(password));
+        hash(~type_=Argon2id, buffer)
+        |> Js.Promise.then_(hashedString =>
+             verify(hashedString, buffer)
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(true) |> Js.Promise.resolve
+                )
+           );
+      });
+
+      testPromise("argon2id wrong password", () =>
+        hash(~type_=Argon2id, Buffer(Node.Buffer.fromString(password)))
+        |> Js.Promise.then_(hashedString =>
+             verify(
+               hashedString,
+               Buffer(Node.Buffer.fromString("passworld")),
+             )
+             |> Js.Promise.then_(result =>
+                  expect(result) |> toBe(false) |> Js.Promise.resolve
+                )
+           )
+      );
+
+      testPromise("old hash format", () =>
+        verify(
+          precomputedHashes.oldFormat |> toHashed,
+          Buffer(Node.Buffer.fromString(password)),
+        )
+        |> Js.Promise.then_(result =>
+             expect(result) |> toBe(true) |> Js.Promise.resolve
+           )
+      );
+    });
   });
 });

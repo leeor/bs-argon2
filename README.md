@@ -10,27 +10,16 @@ npm install @leeor/bs-argon2 --save
 
 ## API
 
-### hashString & hashBuffer
+### hash
 
-Hash a `string` or a `Node.Buffer.t`, respectively, returning an `argon2Hash`.
+Hash a `string` or a `Node.Buffer.t` returning an `argon2Hash`.
 
 ```Reason
-let hashString:
-  (
-    ~hashLength: int=?,
-    ~timeCost: int=?,
-    ~memoryCost: int=?,
-    ~parallelism: int=?,
-    ~type_: argon2Type=?,
-    ~version: argon2Version=?,
-    ~salt: Node.Buffer.t=?,
-    ~saltLength: int=?,
-    ~associatedData: Node.Buffer.t=?,
-    string
-  ) =>
-  Js.Promise.t(argon2Hash);
+type hashInput =
+  | String(string)
+  | Buffer(Node.Buffer.t);
 
-let hashBuffer:
+let hash:
   (
     ~hashLength: int=?,
     ~timeCost: int=?,
@@ -41,32 +30,21 @@ let hashBuffer:
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
-    Node.Buffer.t
+    hashInput
   ) =>
   Js.Promise.t(argon2Hash);
 ```
 
-### hashStringRaw & hashBufferRaw
+### hashRaw
 
-Hash a `string` or a `Node.Buffer.t`, respectively, returning a `Node.Buffer.t`.
+Hash a `string` or a `Node.Buffer.t` returning a `Node.Buffer.t`.
 
 ```Reason
-let hashStringRaw:
-  (
-    ~hashLength: int=?,
-    ~timeCost: int=?,
-    ~memoryCost: int=?,
-    ~parallelism: int=?,
-    ~type_: argon2Type=?,
-    ~version: argon2Version=?,
-    ~salt: Node.Buffer.t=?,
-    ~saltLength: int=?,
-    ~associatedData: Node.Buffer.t=?,
-    string
-  ) =>
-  Js.Promise.t(Node.Buffer.t);
+type hashInput =
+  | String(string)
+  | Buffer(Node.Buffer.t);
 
-let hashBufferRaw:
+let hashRaw:
   (
     ~hashLength: int=?,
     ~timeCost: int=?,
@@ -77,7 +55,7 @@ let hashBufferRaw:
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
-    Node.Buffer.t
+    hashInput
   ) =>
   Js.Promise.t(Node.Buffer.t);
 ```
@@ -92,12 +70,14 @@ let needsRehash:
   bool;
 ```
 
-### verifyString & verifyBuffer
+### verify
 
-Verify a given `string` or `Node.Buffer.t`, respectively, against a previously generated hash.
+Verify a given `string` or `Node.Buffer.t` against a previously generated hash.
 
 ```Reason
-let verifyString: (argon2Hash, string) => Js.Promise.t(bool);
+type hashInput =
+  | String(string)
+  | Buffer(Node.Buffer.t);
 
-let verifyBuffer: (argon2Hash, Node.Buffer.t) => Js.Promise.t(bool);
+let verify: (argon2Hash, hashInput) => Js.Promise.t(bool);
 ```

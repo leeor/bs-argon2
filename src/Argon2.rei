@@ -34,7 +34,11 @@ type limits = {
 let limits: limits;
 let defaults: defaultOptions;
 
-let hashString:
+type hashInput =
+  | String(string)
+  | Buffer(Node.Buffer.t);
+
+let hash:
   (
     ~hashLength: int=?,
     ~timeCost: int=?,
@@ -45,11 +49,11 @@ let hashString:
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
-    string
+    hashInput
   ) =>
   Js.Promise.t(argon2Hash);
 
-let hashBuffer:
+let hashRaw:
   (
     ~hashLength: int=?,
     ~timeCost: int=?,
@@ -60,42 +64,11 @@ let hashBuffer:
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
-    Node.Buffer.t
-  ) =>
-  Js.Promise.t(argon2Hash);
-
-let hashStringRaw:
-  (
-    ~hashLength: int=?,
-    ~timeCost: int=?,
-    ~memoryCost: int=?,
-    ~parallelism: int=?,
-    ~type_: argon2Type=?,
-    ~version: argon2Version=?,
-    ~salt: Node.Buffer.t=?,
-    ~saltLength: int=?,
-    ~associatedData: Node.Buffer.t=?,
-    string
+    hashInput
   ) =>
   Js.Promise.t(Node.Buffer.t);
 
-let hashBufferRaw:
-  (
-    ~hashLength: int=?,
-    ~timeCost: int=?,
-    ~memoryCost: int=?,
-    ~parallelism: int=?,
-    ~type_: argon2Type=?,
-    ~version: argon2Version=?,
-    ~salt: Node.Buffer.t=?,
-    ~saltLength: int=?,
-    ~associatedData: Node.Buffer.t=?,
-    Node.Buffer.t
-  ) =>
-  Js.Promise.t(Node.Buffer.t);
-
-let verifyString: (argon2Hash, string) => Js.Promise.t(bool);
-let verifyBuffer: (argon2Hash, Node.Buffer.t) => Js.Promise.t(bool);
+let verify: (argon2Hash, hashInput) => Js.Promise.t(bool);
 
 let needsRehash:
   (

@@ -184,31 +184,30 @@ let defaults = {
 };
 
 [@bs.module "argon2"]
-external hashStringRaw: (string, options) => Js.Promise.t(Node.Buffer.t) =
+external hash:
+  ([@bs.unwrap] [ | `String(string) | `Buffer(Node.Buffer.t)], options) =>
+  Js.Promise.t(argon2Hash) =
+  "";
+
+[@bs.module "argon2"]
+external hashRaw:
+  ([@bs.unwrap] [ | `String(string) | `Buffer(Node.Buffer.t)], options) =>
+  Js.Promise.t(Node.Buffer.t) =
   "hash";
 
 [@bs.module "argon2"]
-external hashBufferRaw:
-  (Node.Buffer.t, options) => Js.Promise.t(Node.Buffer.t) =
-  "hash";
-
-[@bs.module "argon2"]
-external hashString: (string, options) => Js.Promise.t(argon2Hash) = "hash";
-
-[@bs.module "argon2"]
-external hashBuffer: (Node.Buffer.t, options) => Js.Promise.t(argon2Hash) =
-  "hash";
-
-[@bs.module "argon2"]
-external verifyString: (argon2Hash, string) => Js.Promise.t(bool) = "verify";
-
-[@bs.module "argon2"]
-external verifyBuffer: (argon2Hash, Node.Buffer.t) => Js.Promise.t(bool) =
+external verify:
+  (argon2Hash, [@bs.unwrap] [ | `String(string) | `Buffer(Node.Buffer.t)]) =>
+  Js.Promise.t(bool) =
   "verify";
 
 [@bs.module "argon2"] external needsRehash: (argon2Hash, options) => bool = "";
 
-let hashString =
+type hashInput =
+  | String(string)
+  | Buffer(Node.Buffer.t);
+
+let hash =
     (
       ~hashLength: option(int)=?,
       ~timeCost: option(int)=?,
@@ -219,7 +218,7 @@ let hashString =
       ~salt: option(Node.Buffer.t)=?,
       ~saltLength: option(int)=?,
       ~associatedData: option(Node.Buffer.t)=?,
-      str,
+      input,
     ) => {
   let hashOptions =
     options(
@@ -244,10 +243,16 @@ let hashString =
       (),
     );
 
-  hashString(str, hashOptions);
+  let stringOrBuffer =
+    switch (input) {
+    | String(str) => `String(str)
+    | Buffer(buf) => `Buffer(buf)
+    };
+
+  hash(stringOrBuffer, hashOptions);
 };
 
-let hashBuffer =
+let hashRaw =
     (
       ~hashLength: option(int)=?,
       ~timeCost: option(int)=?,
@@ -258,46 +263,7 @@ let hashBuffer =
       ~salt: option(Node.Buffer.t)=?,
       ~saltLength: option(int)=?,
       ~associatedData: option(Node.Buffer.t)=?,
-      buffer,
-    ) => {
-  let hashOptions =
-    options(
-      ~hashLength?,
-      ~timeCost?,
-      ~memoryCost?,
-      ~parallelism?,
-      ~type_=?
-        switch (type_) {
-        | Some(t) => Some(argon2TypeToJs(t))
-        | None => None
-        },
-      ~version=?
-        switch (version) {
-        | Some(v) => Some(argon2VersionToJs(v))
-        | None => None
-        },
-      ~salt?,
-      ~saltLength?,
-      ~associatedData?,
-      ~raw=false,
-      (),
-    );
-
-  hashBuffer(buffer, hashOptions);
-};
-
-let hashStringRaw =
-    (
-      ~hashLength: option(int)=?,
-      ~timeCost: option(int)=?,
-      ~memoryCost: option(int)=?,
-      ~parallelism: option(int)=?,
-      ~type_: option(argon2Type)=?,
-      ~version: option(argon2Version)=?,
-      ~salt: option(Node.Buffer.t)=?,
-      ~saltLength: option(int)=?,
-      ~associatedData: option(Node.Buffer.t)=?,
-      str,
+      input,
     ) => {
   let hashOptions =
     options(
@@ -322,54 +288,23 @@ let hashStringRaw =
       (),
     );
 
-  hashStringRaw(str, hashOptions);
+  let stringOrBuffer =
+    switch (input) {
+    | String(str) => `String(str)
+    | Buffer(buf) => `Buffer(buf)
+    };
+
+  hashRaw(stringOrBuffer, hashOptions);
 };
 
-let hashBufferRaw =
-    (
-      ~hashLength: option(int)=?,
-      ~timeCost: option(int)=?,
-      ~memoryCost: option(int)=?,
-      ~parallelism: option(int)=?,
-      ~type_: option(argon2Type)=?,
-      ~version: option(argon2Version)=?,
-      ~salt: option(Node.Buffer.t)=?,
-      ~saltLength: option(int)=?,
-      ~associatedData: option(Node.Buffer.t)=?,
-      buffer,
-    ) => {
-  let hashOptions =
-    options(
-      ~hashLength?,
-      ~timeCost?,
-      ~memoryCost?,
-      ~parallelism?,
-      ~type_=?
-        switch (type_) {
-        | Some(t) => Some(argon2TypeToJs(t))
-        | None => None
-        },
-      ~version=?
-        switch (version) {
-        | Some(v) => Some(argon2VersionToJs(v))
-        | None => None
-        },
-      ~salt?,
-      ~saltLength?,
-      ~associatedData?,
-      ~raw=true,
-      (),
-    );
+let verify = (hash, input) => {
+  let stringOrBuffer =
+    switch (input) {
+    | String(str) => `String(str)
+    | Buffer(buf) => `Buffer(buf)
+    };
 
-  hashBufferRaw(buffer, hashOptions);
-};
-
-let verifyString = (str1, str2) => {
-  verifyString(str1, str2);
-};
-
-let verifyBuffer = (str, buffer) => {
-  verifyBuffer(str, buffer);
+  verify(hash, stringOrBuffer);
 };
 
 let needsRehash =
