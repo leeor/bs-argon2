@@ -12,6 +12,7 @@ type precomputedHashes = {
   rawWithNull: Node.Buffer.t,
   rawArgon2d: Node.Buffer.t,
   rawArgon2id: Node.Buffer.t,
+  rawWithAd: Node.Buffer.t,
   oldFormat: string,
 };
 
@@ -19,8 +20,8 @@ type precomputedHashes = {
 external allocBuffer: (int, string) => Node.Buffer.t = "alloc";
 
 external toJsExn: Js.Promise.error => Js.Exn.t = "%identity";
-external toString: argon2Hash => string = "%identity";
-external toHashed: string => argon2Hash = "%identity";
+external toString: hash => string = "%identity";
+external toHashed: string => hash = "%identity";
 
 let password = "password";
 let passwordWithNull = {j|pass\0word|j};
@@ -51,6 +52,11 @@ let precomputedHashes = {
   rawArgon2id:
     Node.Buffer.fromStringWithEncoding(
       "7f16c555d3c63d0d4d268cbcec269369bcab5ce2997a967d486045c0f90f276f",
+      `hex,
+    ),
+  rawWithAd:
+    Node.Buffer.fromStringWithEncoding(
+      "d55541e259c3d5c99969e40896ac8e310d7b83a1fdae50b94bfbe560e5ae0fe3",
       `hex,
     ),
   oldFormat: "$argon2i$m=4096,t=3,p=1$tbagT6b1YH33niCo9lVzuA$htv/k+OqWk1V9zD9k5DOBi2kcfcZ6Xu3tWmwEPV3/nc",
@@ -162,6 +168,19 @@ describe("Argon2", () => {
              |> Js.Promise.resolve
            )
       );
+
+      testPromise("with associatedData", () =>
+        hash(
+          ~associatedData,
+          ~salt,
+          Buffer(Node.Buffer.fromString(password)),
+        )
+        |> Js.Promise.then_(hashedString =>
+             expect(hashedString |> toString)
+             |> toEqual(precomputedHashes.withAd)
+             |> Js.Promise.resolve
+           )
+      );
     });
   });
 
@@ -202,7 +221,17 @@ describe("Argon2", () => {
              |> Js.Promise.resolve
            )
       );
+
+      testPromise("with associatedData", () =>
+        hashRaw(~associatedData, ~salt, String(password))
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawWithAd)
+             |> Js.Promise.resolve
+           )
+      );
     });
+
     describe("Buffer", () => {
       testPromise("with argon2i", () =>
         hashRaw(~salt, Buffer(Node.Buffer.fromString(password)))
@@ -244,6 +273,19 @@ describe("Argon2", () => {
         |> Js.Promise.then_(hashedBuffer =>
              expect(hashedBuffer)
              |> toEqual(precomputedHashes.rawWithNull)
+             |> Js.Promise.resolve
+           )
+      );
+
+      testPromise("with associatedData", () =>
+        hashRaw(
+          ~associatedData,
+          ~salt,
+          Buffer(Node.Buffer.fromString(password)),
+        )
+        |> Js.Promise.then_(hashedBuffer =>
+             expect(hashedBuffer)
+             |> toEqual(precomputedHashes.rawWithAd)
              |> Js.Promise.resolve
            )
       );
