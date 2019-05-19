@@ -10,9 +10,13 @@ npm install @leeor/bs-argon2 --save
 
 ## API
 
+### The `Argon2.hash` type
+
+To promote security of the generated hashes, a special type is used to represent the output of the hashing functions. This should be used for protecting at the type level against leakage and usage of these values in sensitive areas (such as code that is used by both client and server).
+
 ### hash
 
-Hash a `string` or a `Node.Buffer.t` returning an `argon2Hash`.
+Hash a `string` or a `Node.Buffer.t` returning an `Argon2.hash`.
 
 ```Reason
 type hashInput =
@@ -25,14 +29,14 @@ let hash:
     ~timeCost: int=?,
     ~memoryCost: int=?,
     ~parallelism: int=?,
-    ~type_: argon2Type=?,
-    ~version: argon2Version=?,
+    ~type_: hashMode=?,
+    ~version: version=?,
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
     hashInput
   ) =>
-  Js.Promise.t(argon2Hash);
+  Js.Promise.t(hash);
 ```
 
 ### hashRaw
@@ -50,8 +54,8 @@ let hashRaw:
     ~timeCost: int=?,
     ~memoryCost: int=?,
     ~parallelism: int=?,
-    ~type_: argon2Type=?,
-    ~version: argon2Version=?,
+    ~type_: hashMode=?,
+    ~version: version=?,
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
@@ -66,7 +70,7 @@ Return whether the hash needs to be recomputed due to changed options/version.
 
 ```Reason
 let needsRehash:
-  (~timeCost: int=?, ~memoryCost: int=?, ~version: argon2Version=?, argon2Hash) =>
+  (~timeCost: int=?, ~memoryCost: int=?, ~version: version=?, hash) =>
   bool;
 ```
 
@@ -79,5 +83,16 @@ type hashInput =
   | String(string)
   | Buffer(Node.Buffer.t);
 
-let verify: (argon2Hash, hashInput) => Js.Promise.t(bool);
+let verify: (hash, hashInput) => Js.Promise.t(bool);
 ```
+
+### Js.Json.t Enconding/decoding
+
+Use the following two functions when (de)serializing generated hashes:
+
+```Reason
+let hashToJson: hash => Js.Json.t;
+let jsonToHash: Js.Json.t => hash;
+```
+
+Note: in its current implementation, `jsonToHash` will raise an exception if the decoding fails.

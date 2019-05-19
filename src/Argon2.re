@@ -1,4 +1,4 @@
-type argon2Hash = string;
+type hash = string;
 
 [@bs.deriving abstract]
 type options = {
@@ -24,13 +24,13 @@ type options = {
 };
 
 [@bs.deriving jsConverter]
-type argon2Type =
+type hashMode =
   | Argon2d
   | Argon2i
   | Argon2id;
 
 [@bs.deriving jsConverter]
-type argon2Version =
+type version =
   | [@bs.as 0x10] Version10
   | [@bs.as 0x13] Version13;
 
@@ -39,8 +39,8 @@ type defaultOptions = {
   timeCost: int,
   memoryCost: int,
   parallelism: int,
-  type_: argon2Type,
-  version: argon2Version,
+  type_: hashMode,
+  version,
   saltLength: int,
 };
 
@@ -184,11 +184,10 @@ let defaults = {
 };
 
 [@bs.module "argon2"]
-external hashString: (string, options) => Js.Promise.t(argon2Hash) = "hash";
+external hashString: (string, options) => Js.Promise.t(hash) = "hash";
 
 [@bs.module "argon2"]
-external hashBuffer: (Node.Buffer.t, options) => Js.Promise.t(argon2Hash) =
-  "hash";
+external hashBuffer: (Node.Buffer.t, options) => Js.Promise.t(hash) = "hash";
 
 [@bs.module "argon2"]
 external hashStringRaw: (string, options) => Js.Promise.t(Node.Buffer.t) =
@@ -200,13 +199,12 @@ external hashBufferRaw:
   "hash";
 
 [@bs.module "argon2"]
-external verifyString: (argon2Hash, string) => Js.Promise.t(bool) = "verify";
+external verifyString: (hash, string) => Js.Promise.t(bool) = "verify";
 
 [@bs.module "argon2"]
-external verifyBuffer: (argon2Hash, Node.Buffer.t) => Js.Promise.t(bool) =
-  "verify";
+external verifyBuffer: (hash, Node.Buffer.t) => Js.Promise.t(bool) = "verify";
 
-[@bs.module "argon2"] external needsRehash: (argon2Hash, options) => bool = "";
+[@bs.module "argon2"] external needsRehash: (hash, options) => bool = "";
 
 type hashInput =
   | String(string)
@@ -218,8 +216,8 @@ let hash =
       ~timeCost: option(int)=?,
       ~memoryCost: option(int)=?,
       ~parallelism: option(int)=?,
-      ~type_: option(argon2Type)=?,
-      ~version: option(argon2Version)=?,
+      ~type_: option(hashMode)=?,
+      ~version: option(version)=?,
       ~salt: option(Node.Buffer.t)=?,
       ~saltLength: option(int)=?,
       ~associatedData: option(Node.Buffer.t)=?,
@@ -233,12 +231,12 @@ let hash =
       ~parallelism?,
       ~type_=?
         switch (type_) {
-        | Some(t) => Some(argon2TypeToJs(t))
+        | Some(t) => Some(hashModeToJs(t))
         | None => None
         },
       ~version=?
         switch (version) {
-        | Some(v) => Some(argon2VersionToJs(v))
+        | Some(v) => Some(versionToJs(v))
         | None => None
         },
       ~salt?,
@@ -263,8 +261,8 @@ let hashRaw =
       ~timeCost: option(int)=?,
       ~memoryCost: option(int)=?,
       ~parallelism: option(int)=?,
-      ~type_: option(argon2Type)=?,
-      ~version: option(argon2Version)=?,
+      ~type_: option(hashMode)=?,
+      ~version: option(version)=?,
       ~salt: option(Node.Buffer.t)=?,
       ~saltLength: option(int)=?,
       ~associatedData: option(Node.Buffer.t)=?,
@@ -278,12 +276,12 @@ let hashRaw =
       ~parallelism?,
       ~type_=?
         switch (type_) {
-        | Some(t) => Some(argon2TypeToJs(t))
+        | Some(t) => Some(hashModeToJs(t))
         | None => None
         },
       ~version=?
         switch (version) {
-        | Some(v) => Some(argon2VersionToJs(v))
+        | Some(v) => Some(versionToJs(v))
         | None => None
         },
       ~salt?,
@@ -312,7 +310,7 @@ let needsRehash =
     (
       ~timeCost: option(int)=?,
       ~memoryCost: option(int)=?,
-      ~version: option(argon2Version)=?,
+      ~version: option(version)=?,
       str,
     ) => {
   let hashOptions =
@@ -321,7 +319,7 @@ let needsRehash =
       ~memoryCost?,
       ~version=?
         switch (version) {
-        | Some(v) => Some(argon2VersionToJs(v))
+        | Some(v) => Some(versionToJs(v))
         | None => None
         },
       ~raw=false,

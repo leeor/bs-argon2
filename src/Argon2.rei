@@ -1,27 +1,27 @@
-type argon2Hash;
+type hash;
 
-type argon2Type =
+type hashMode =
   | Argon2d
   | Argon2i
   | Argon2id;
 
-type argon2Version =
+type version =
   | Version10
   | Version13;
-
-type numericLimit = {
-  min: int,
-  max: int,
-};
 
 type defaultOptions = {
   hashLength: int,
   timeCost: int,
   memoryCost: int,
   parallelism: int,
-  type_: argon2Type,
-  version: argon2Version,
+  type_: hashMode,
+  version,
   saltLength: int,
+};
+
+type numericLimit = {
+  min: int,
+  max: int,
 };
 
 type limits = {
@@ -44,14 +44,14 @@ let hash:
     ~timeCost: int=?,
     ~memoryCost: int=?,
     ~parallelism: int=?,
-    ~type_: argon2Type=?,
-    ~version: argon2Version=?,
+    ~type_: hashMode=?,
+    ~version: version=?,
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
     hashInput
   ) =>
-  Js.Promise.t(argon2Hash);
+  Js.Promise.t(hash);
 
 let hashRaw:
   (
@@ -59,8 +59,8 @@ let hashRaw:
     ~timeCost: int=?,
     ~memoryCost: int=?,
     ~parallelism: int=?,
-    ~type_: argon2Type=?,
-    ~version: argon2Version=?,
+    ~type_: hashMode=?,
+    ~version: version=?,
     ~salt: Node.Buffer.t=?,
     ~saltLength: int=?,
     ~associatedData: Node.Buffer.t=?,
@@ -68,16 +68,10 @@ let hashRaw:
   ) =>
   Js.Promise.t(Node.Buffer.t);
 
-let verify: (argon2Hash, hashInput) => Js.Promise.t(bool);
+let verify: (hash, hashInput) => Js.Promise.t(bool);
 
 let needsRehash:
-  (
-    ~timeCost: int=?,
-    ~memoryCost: int=?,
-    ~version: argon2Version=?,
-    argon2Hash
-  ) =>
-  bool;
+  (~timeCost: int=?, ~memoryCost: int=?, ~version: version=?, hash) => bool;
 
-let hashToJson: argon2Hash => Js.Json.t;
-let jsonToHash: Js.Json.t => argon2Hash;
+let hashToJson: hash => Js.Json.t;
+let jsonToHash: Js.Json.t => hash;
