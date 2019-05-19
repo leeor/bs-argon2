@@ -184,21 +184,26 @@ let defaults = {
 };
 
 [@bs.module "argon2"]
-external hash:
-  ([@bs.unwrap] [ | `String(string) | `Buffer(Node.Buffer.t)], options) =>
-  Js.Promise.t(argon2Hash) =
-  "";
+external hashString: (string, options) => Js.Promise.t(argon2Hash) = "hash";
 
 [@bs.module "argon2"]
-external hashRaw:
-  ([@bs.unwrap] [ | `String(string) | `Buffer(Node.Buffer.t)], options) =>
-  Js.Promise.t(Node.Buffer.t) =
+external hashBuffer: (Node.Buffer.t, options) => Js.Promise.t(argon2Hash) =
   "hash";
 
 [@bs.module "argon2"]
-external verify:
-  (argon2Hash, [@bs.unwrap] [ | `String(string) | `Buffer(Node.Buffer.t)]) =>
-  Js.Promise.t(bool) =
+external hashStringRaw: (string, options) => Js.Promise.t(Node.Buffer.t) =
+  "hash";
+
+[@bs.module "argon2"]
+external hashBufferRaw:
+  (Node.Buffer.t, options) => Js.Promise.t(Node.Buffer.t) =
+  "hash";
+
+[@bs.module "argon2"]
+external verifyString: (argon2Hash, string) => Js.Promise.t(bool) = "verify";
+
+[@bs.module "argon2"]
+external verifyBuffer: (argon2Hash, Node.Buffer.t) => Js.Promise.t(bool) =
   "verify";
 
 [@bs.module "argon2"] external needsRehash: (argon2Hash, options) => bool = "";
@@ -243,13 +248,13 @@ let hash =
       (),
     );
 
-  let stringOrBuffer =
+  let hashPromise =
     switch (input) {
-    | String(str) => `String(str)
-    | Buffer(buf) => `Buffer(buf)
+    | String(str) => hashString(str, hashOptions)
+    | Buffer(buf) => hashBuffer(buf, hashOptions)
     };
 
-  hash(stringOrBuffer, hashOptions);
+  hashPromise;
 };
 
 let hashRaw =
@@ -288,24 +293,20 @@ let hashRaw =
       (),
     );
 
-  let stringOrBuffer =
+  let hashPromise =
     switch (input) {
-    | String(str) => `String(str)
-    | Buffer(buf) => `Buffer(buf)
+    | String(str) => hashStringRaw(str, hashOptions)
+    | Buffer(buf) => hashBufferRaw(buf, hashOptions)
     };
 
-  hashRaw(stringOrBuffer, hashOptions);
+  hashPromise;
 };
 
-let verify = (hash, input) => {
-  let stringOrBuffer =
-    switch (input) {
-    | String(str) => `String(str)
-    | Buffer(buf) => `Buffer(buf)
-    };
-
-  verify(hash, stringOrBuffer);
-};
+let verify = (hash, input) =>
+  switch (input) {
+  | String(str) => verifyString(hash, str)
+  | Buffer(buf) => verifyBuffer(hash, buf)
+  };
 
 let needsRehash =
     (
