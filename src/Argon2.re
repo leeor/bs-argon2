@@ -48,8 +48,8 @@ let decodeDefaultsValue = (key, decoder, json) => {
   Js.Dict.get(json, key) |> decoder;
 };
 
-let decodeIntValue = (fallback, possibleJson) =>
-  switch (possibleJson) {
+let decodeIntValue = fallback =>
+  fun
   | Some(json) =>
     json
     |> Js.Json.decodeNumber
@@ -58,11 +58,10 @@ let decodeIntValue = (fallback, possibleJson) =>
       | Some(num) => num |> int_of_float
       | None => fallback
     )
-  | None => fallback
-  };
+  | None => fallback;
 
-let decodeType = possibleJson => {
-  switch (possibleJson) {
+let decodeType =
+  fun
   | Some(json) =>
     json
     |> Js.Json.decodeNumber
@@ -75,12 +74,10 @@ let decodeType = possibleJson => {
         Js.Exn.raiseError("unknown Argon2 type: " ++ Js.Json.stringify(json))
     )
   | None =>
-    Js.Exn.raiseError("Argon2 type information not found in defaults object")
-  };
-};
+    Js.Exn.raiseError("Argon2 type information not found in defaults object");
 
-let decodeVersion = possibleJson => {
-  switch (possibleJson) {
+let decodeVersion =
+  fun
   | Some(json) =>
     json
     |> Js.Json.decodeNumber
@@ -93,9 +90,8 @@ let decodeVersion = possibleJson => {
           "unknown Argon2 version: " ++ Js.Json.stringify(json),
         )
     )
-  | _ => Js.Exn.raiseError("version information not found in defaults object")
-  };
-};
+  | _ =>
+    Js.Exn.raiseError("version information not found in defaults object");
 
 type numericLimit = {
   min: int,
@@ -124,11 +120,9 @@ let decodeNumericLimits = (key, json) => {
       limits
       |> Js.Dict.get(_, "min")
       |> (
-        num =>
-          switch (num) {
-          | Some(num) => num |> Js.Json.decodeNumber
-          | None => None
-          }
+        fun
+        | Some(num) => num |> Js.Json.decodeNumber
+        | None => None
       )
       |> Belt.Option.getWithDefault(_, 0.)
       |> int_of_float,
@@ -136,11 +130,9 @@ let decodeNumericLimits = (key, json) => {
       limits
       |> Js.Dict.get(_, "max")
       |> (
-        num =>
-          switch (num) {
-          | Some(num) => num |> Js.Json.decodeNumber
-          | None => None
-          }
+        fun
+        | Some(num) => num |> Js.Json.decodeNumber
+        | None => None
       )
       |> Belt.Option.getWithDefault(_, Int32.max_int |> Int32.to_float)
       |> int_of_float,
@@ -300,11 +292,10 @@ let hashRaw =
   hashPromise;
 };
 
-let verify = (hash, input) =>
-  switch (input) {
+let verify = hash =>
+  fun
   | String(str) => verifyString(hash, str)
-  | Buffer(buf) => verifyBuffer(hash, buf)
-  };
+  | Buffer(buf) => verifyBuffer(hash, buf);
 
 let needsRehash =
     (
