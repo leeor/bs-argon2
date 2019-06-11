@@ -2,6 +2,8 @@
   "name": "@leeor/bs-argon2",
   "version": "1.0.0",
   "description": "Bucklescript bindings for the argon2 module",
+  "homepage": "https://github.com/leeor/bs-argon2",
+  "bugs": "https://github.com/leeor/bs-argon2/issues",
   "scripts": {
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
