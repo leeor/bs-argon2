@@ -1,6 +1,6 @@
 {
   "name": "@leeor/bs-argon2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bucklescript bindings for the argon2 module",
   "homepage": "https://github.com/leeor/bs-argon2",
   "bugs": "https://github.com/leeor/bs-argon2/issues",
@@ -11,9 +11,16 @@
     "test": "jest",
     "test:watch": "jest --watch"
   },
-  "keywords": ["BuckleScript", "reason", "argon2"],
+  "keywords": [
+    "BuckleScript",
+    "reason",
+    "argon2"
+  ],
   "main": "index.js",
-  "files": ["src/", "bsconfig.json"],
+  "files": [
+    "src/",
+    "bsconfig.json"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/leeor/bs-argon2.git"
