@@ -134,7 +134,7 @@ let decodeNumericLimits = (key, json) => {
         | Some(num) => num |> Js.Json.decodeNumber
         | None => None
       )
-      |> Belt.Option.getWithDefault(_, Int32.max_int |> Int32.to_float)
+      |> Belt.Option.getWithDefault(_, Obj.magic(Int32.max_int))
       |> int_of_float,
   };
 };
@@ -196,7 +196,7 @@ external verifyString: (hash, string) => Js.Promise.t(bool) = "verify";
 [@bs.module "argon2"]
 external verifyBuffer: (hash, Node.Buffer.t) => Js.Promise.t(bool) = "verify";
 
-[@bs.module "argon2"] external needsRehash: (hash, options) => bool = "";
+[@bs.module "argon2"] external needsRehash: (hash, options) => bool = "needsRehash";
 
 type hashInput =
   | String(string)
